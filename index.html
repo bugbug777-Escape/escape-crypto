@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+  <script>
+    const url = 'https://hex-escape-room.herokuapp.com/api/linePay/v3/payments/request';
+    const { HmacSHA256, SHA256 } = CryptoJS;
+    const { Base64 } = CryptoJS.enc;
+
+    const sampleData = {
+      a: {
+        amount: 100,
+        currency: 'TWD',
+        orderId: 'xgmks1639467061',
+      },
+    };
+
+    const secret = 'OPbD1Pr6ClcPXvd9BHHso1EvhARV0iEz';
+    const channelId = '1234567890';
+    const uri = '/v3/payments/request';
+
+    // 以下片段開始可能不正確，也可能正確，請協助完成
+    const nonce = Date.now(); // 1. 請替換成個人暱稱或工號
+    const body = sampleData.a;
+    const encrypt = Base64.stringify(HmacSHA256((secret + uri + JSON.stringify(body) + nonce), secret));
+
+    const headers = {
+      headers: {
+        // 3. 請依照文件規則發送 Header
+        "X-LINE-ChannelId": channelId,
+        "Content-Type": "application/json",
+        "X-LINE-Authorization-Nonce": nonce,
+        "X-LINE-Authorization": encrypt
+      },
+    };
+    // 4. 發送 API 至主機，路徑正確後可以接收到成功的結果，串接方式可以參考 PostMan
+    const data = body
+    axios.post(url, data, headers).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err.response);
+    })
+  </script>
+</body>
+
+</html>
